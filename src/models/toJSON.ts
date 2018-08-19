@@ -7,5 +7,5 @@ export default {
     delete obj._id;
     delete obj.__v;
     return obj;
-  }
+  },
 };

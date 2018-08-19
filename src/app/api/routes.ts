@@ -1,5 +1,5 @@
-import express from 'express';
 import bodyParser from 'body-parser';
+import express from 'express';
 import * as families from './families';
 
 const router = express.Router();

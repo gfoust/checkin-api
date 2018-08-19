@@ -1,4 +1,4 @@
-import express, { Request, Response, NextFunction } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import morgan from 'morgan';
 
 import apiRoutes from './api/routes';
@@ -13,7 +13,7 @@ app.use(express.static('static_web'));
 
 app.use('/env', (req, res) => {
   res.json(process.env);
-})
+});
 
 app.use((req, res) => {
     res.status(404);

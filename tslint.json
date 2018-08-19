@@ -1,0 +1,14 @@
+{
+    "defaultSeverity": "warning",
+    "extends": [
+        "tslint:recommended"
+    ],
+    "rules": {
+      "no-console": false,
+      "forin": false,
+      "interface-name": [ true, "never-prefix" ],
+      "object-literal-sort-keys": false,
+      "one-line": [ true, "check-open-brack", "check-whitespace" ],
+      "quotemark": [ true, "single" ]
+    }
+}

@@ -2,17 +2,17 @@ import development from './development';
 import production from './production';
 
 export interface Config {
-  serverPort: number,
+  serverPort: number;
   db: {
     host: string;
     port: number;
     name: string;
     user?: string;
     pass?: string;
-  }
+  };
 }
 
-let config: Config = {
+const config: Config = {
   serverPort: 8000,
   db: {
     host: 'checkin-mongo',

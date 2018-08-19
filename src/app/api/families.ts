@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from 'express';
-import { Dictionary } from '../../util';
+import { NextFunction, Request, Response } from 'express';
 import Family from '../../models/family';
+import { Dictionary } from '../../util';
 
 function validationError(err: any) {
   if (err.name === 'ValidationError') {
@@ -11,19 +11,19 @@ function validationError(err: any) {
 
     return {
       message: 'Request contained invalid data',
-      errors
+      errors,
     };
   }
 }
 
 export async function readFamilies(req: Request, res: Response) {
-  let families = await Family.find();
+  const families = await Family.find();
   res.json(families);
 }
 
 export async function createFamily(req: Request, res: Response, next: NextFunction) {
   try {
-    let family = new Family({ name: req.body.name, tag: req.body.tag });
+    const family = new Family({ name: req.body.name, tag: req.body.tag });
     await family.save();
     res.json(family);
   }
@@ -51,7 +51,7 @@ export async function lookupFamily(req: Request, res: Response, next: NextFuncti
       res.json({ message: `Family '${tag}' was not found`});
     }
   }
-  catch(err) {
+  catch (err) {
     next(err);
   }
 }

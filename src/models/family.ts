@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+
 import './mongodb';
 import toJSON from './toJSON';
 
@@ -11,17 +12,16 @@ const FamilySchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
-    minlength: 2,
     index: true,
   },
   tag: {
     type: String,
     required: true,
     trim: true,
-    minLength: 2,
+    minLength: 3,
     match: /^[\w\-$.]+$/,
     unique: true,
-  }
+  },
 }, { toJSON });
 
 export interface Family extends FamilyData, mongoose.Document { }
