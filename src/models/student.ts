@@ -1,14 +1,14 @@
 import mongoose from 'mongoose';
-
+import Class from './class';
 import Family from './family';
 import './mongodb';
-import toJSON from './toJSON';
 
 export interface StudentData {
   tag: string;
   firstName: string;
   lastName: string;
   family: string | Family;
+  class: string | Class;
 }
 
 const StudentSchema = new mongoose.Schema({
@@ -36,6 +36,11 @@ const StudentSchema = new mongoose.Schema({
     required: true,
     ref: 'Family',
   },
+  class: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: 'Class',
+  },
 }, {
   toJSON: {
     getters: false,
@@ -44,8 +49,11 @@ const StudentSchema = new mongoose.Schema({
       obj.id = obj._id;
       delete obj._id;
       delete obj.__v;
-      if (typeof obj.family === 'object') {
+      if (typeof obj.family === 'object' && ! (obj.family instanceof mongoose.Types.ObjectId)) {
         obj.family = obj.family.tag;
+      }
+      if (typeof obj.class === 'object' && ! (obj.class instanceof mongoose.Types.ObjectId)) {
+        obj.class = obj.class.tag;
       }
       return obj;
     },

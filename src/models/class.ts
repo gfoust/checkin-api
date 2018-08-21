@@ -2,12 +2,12 @@ import mongoose from 'mongoose';
 import './mongodb';
 import toJSON from './toJSON';
 
-export interface FamilyData {
+export interface ClassData {
   tag: string;
   name: string;
 }
 
-const FamilySchema = new mongoose.Schema({
+const ClassSchema = new mongoose.Schema({
   tag: {
     type: String,
     required: true,
@@ -25,8 +25,8 @@ const FamilySchema = new mongoose.Schema({
   },
 }, { toJSON });
 
-export interface Family extends FamilyData, mongoose.Document { }
+export interface Class extends ClassData, mongoose.Document { }
 
-export const Family = mongoose.model<Family>('Family', FamilySchema);
+export const Class = mongoose.model<Class>('Class', ClassSchema);
 
-export default Family;
+export default Class;

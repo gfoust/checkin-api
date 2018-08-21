@@ -56,7 +56,7 @@ export function readFamily(req: Request, res: Response) {
   res.json(res.locals.family);
 }
 
-export function patchFamily(req: Request, res: Response, next: NextFunction) {
+export async function patchFamily(req: Request, res: Response, next: NextFunction) {
   const family = res.locals.family as Family;
   for (const key of [ 'tag', 'name' ] as Array<keyof Family>) {
     if (key in req.body) {
@@ -65,7 +65,7 @@ export function patchFamily(req: Request, res: Response, next: NextFunction) {
   }
 
   try {
-    family.save();
+    await family.save();
     res.json(family);
   }
   catch (err) {
