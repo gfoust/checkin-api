@@ -1,20 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import Family from '../../models/family';
-import { Dictionary } from '../../util';
-
-function validationError(err: any) {
-  if (err.name === 'ValidationError') {
-    const errors: Dictionary<string> = { };
-    for (const prop in err.errors) {
-      errors[prop] = err.errors[prop].message;
-    }
-
-    return {
-      message: 'Request contained invalid data',
-      errors,
-    };
-  }
-}
+import validationError from './validationError';
 
 export async function readFamilies(req: Request, res: Response) {
   const families = await Family.find();
@@ -39,16 +25,26 @@ export async function createFamily(req: Request, res: Response, next: NextFuncti
   }
 }
 
-export async function lookupFamily(req: Request, res: Response, next: NextFunction, tag: string) {
+export async function lookupFamily(id: string) {
+  if (id.match(/^[0-9a-fA-F]{24}$/)) {
+    return Family.findById(id);
+  }
+  else {
+    return Family.findOne({ tag: id });
+  }
+}
+
+export async function addFamilyToLocals(req: Request, res: Response, next: NextFunction, id: string) {
   try {
-    const family = await Family.findOne({ tag });
+    const family = await lookupFamily(id);
+
     if (family) {
       res.locals.family = family;
       next();
     }
     else {
       res.status(404);
-      res.json({ message: `Family '${tag}' was not found`});
+      res.json({ message: `Family '${id}' was not found`});
     }
   }
   catch (err) {
@@ -62,9 +58,9 @@ export function readFamily(req: Request, res: Response) {
 
 export function patchFamily(req: Request, res: Response, next: NextFunction) {
   const family = res.locals.family as Family;
-  for (const key of [ 'tag', 'family' ]) {
+  for (const key of [ 'tag', 'name' ] as Array<keyof Family>) {
     if (key in req.body) {
-      res.locals.family[key] = req.body[key];
+      family[key] = req.body[key];
     }
   }
 
@@ -84,8 +80,8 @@ export function patchFamily(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-export function deleteFamily(req: Request, res: Response) {
+export async function deleteFamily(req: Request, res: Response) {
   const family = res.locals.family as Family;
-  res.locals.family.remove();
+  await family.remove();
   res.json(family);
 }
