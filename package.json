@@ -8,6 +8,7 @@
     "build:watch": "tsc -w",
     "docker:build": "docker build -t checkin-server .",
     "docker:run": "docker run -d --name checkin-server -v \"$PWD\":/usr/local/app --net=checkin-net -p 8000:8000 -p 9222:9222 checkin-server",
+    "docker:shutdown": "docker container stop checkin-server && docker container rm checkin-server",
     "lint": "tslint -e node_modules -p tsconfig.json -t stylish",
     "lint:fix": "tslint -e node_modules -p tsconfig.json --fix",
     "start": "node lib/server",

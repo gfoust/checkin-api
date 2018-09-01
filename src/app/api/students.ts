@@ -1,25 +1,54 @@
 import { NextFunction, Request, Response } from 'express';
-import { Class } from '../../models/class';
-import { Family } from '../../models/family';
 import { Student } from '../../models/student';
+import { Dictionary } from '../../util';
 import { lookupClass } from './classes';
-import { lookupFamily } from './families';
 import validationError from './validationError';
 
 export async function readStudents(req: Request, res: Response) {
-  const students = await Student.find().populate('family class');
+  const query: Dictionary<string | null> =  { };
+  if (req.query.firstName) {
+    query.firstName = req.query.firstName;
+  }
+  if (req.query.lastName) {
+    query.lastName = req.query.lastName;
+  }
+  if ('class' in req.query) {
+    if (req.query) {
+      const clas = await lookupClass(req.query.class);
+      if (clas) {
+        query.class = clas.id;
+      }
+      else {
+        res.json([ ]);
+        return;
+      }
+    }
+    else {
+      query.class = null;
+    }
+  }
+  const students = await Student.find(query).populate('class');
   res.json(students);
 }
 
 export async function createStudent(req: Request, res: Response, next: NextFunction) {
   try {
     const student = new Student({
-      tag: req.body.tag,
       firstName: req.body.firstName,
       lastName: req.body.lastName,
-      family: await lookupFamily(req.body.family),
-      class: await lookupClass(req.body.class),
+      status: req.body.status,
+      class: null,
     });
+
+    if (req.body.class) {
+      const clas = await lookupClass(req.body.class);
+      if (clas) {
+        student.class = clas;
+      }
+      else {
+        student.invalidate('class', 'Unknown class', req.body.class, 'Class identifier');
+      }
+    }
 
     await student.save();
     res.json(student);
@@ -38,10 +67,7 @@ export async function createStudent(req: Request, res: Response, next: NextFunct
 
 export async function lookupStudent(id: string) {
   if (id.match(/^[0-9a-fA-F]{24}$/)) {
-    return Student.findById(id);
-  }
-  else {
-    return Student.findOne({ tag: id });
+    return Student.findById(id).populate('class');
   }
 }
 
@@ -65,22 +91,29 @@ export async function addStudentToLocals(req: Request, res: Response, next: Next
 
 export async function readStudent(req: Request, res: Response) {
   const student = res.locals.student as Student;
-  await student.populate('family class').execPopulate();
   res.json(student);
 }
 
 export async function patchStudent(req: Request, res: Response, next: NextFunction) {
   const student = res.locals.student as Student;
-  for (const key of [ 'tag', 'firstName', 'lastName' ] as Array<keyof Student>) {
+  for (const key of [ 'firstName', 'lastName', 'status' ] as Array<keyof Student>) {
     if (key in req.body) {
       student[key] = req.body[key];
     }
   }
-  if ('family' in req.body) {
-    student.family = await lookupFamily(req.body.family) as Family;
-  }
   if ('class' in req.body) {
-    student.class = await lookupClass(req.body.class) as Class;
+    if (req.body.class) {
+      const clas = await lookupClass(req.body.class);
+      if (clas) {
+        student.class = clas;
+      }
+      else {
+        student.invalidate('class', 'Unknown class', req.body.class, 'Class identifier');
+      }
+    }
+    else {
+      student.class = null;
+    }
   }
 
   try {

@@ -1,26 +1,23 @@
 import mongoose from 'mongoose';
-import Class from './class';
-import Family from './family';
-import './mongodb';
+import { Class, isClass } from './class';
+import { isObjectId } from './mongodb';
 
 export interface StudentData {
-  tag: string;
   firstName: string;
   lastName: string;
-  family: string | Family;
-  class: string | Class;
+  class: null | string | mongoose.Types.ObjectId | Class;
 }
 
 const StudentSchema = new mongoose.Schema({
-  tag: {
-    type: String,
-    required: true,
-    trim: true,
-    minLength: 3,
-    maxLength: 20,
-    match: /^[\w\-$.]+$/,
-    unique: true,
-  },
+  // tag: {
+  //   type: String,
+  //   required: true,
+  //   trim: true,
+  //   minLength: 3,
+  //   maxLength: 20,
+  //   match: /^[\w\-$.]+$/,
+  //   unique: true,
+  // },
   firstName: {
     type: String,
     required: true,
@@ -31,15 +28,16 @@ const StudentSchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
-  family: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-    ref: 'Family',
-  },
   class: {
     type: mongoose.Schema.Types.ObjectId,
-    required: true,
     ref: 'Class',
+    default: null,
+  },
+  status: {
+    type: String,
+    required: true,
+    enum: [ 'away', 'present', 'awaited' ],
+    default: 'away',
   },
 }, {
   toJSON: {
@@ -49,11 +47,8 @@ const StudentSchema = new mongoose.Schema({
       obj.id = obj._id;
       delete obj._id;
       delete obj.__v;
-      if (typeof obj.family === 'object' && ! (obj.family instanceof mongoose.Types.ObjectId)) {
-        obj.family = obj.family.tag;
-      }
-      if (typeof obj.class === 'object' && ! (obj.class instanceof mongoose.Types.ObjectId)) {
-        obj.class = obj.class.tag;
+      if (isClass(doc.class)) {
+        obj.class = doc.class.tag;
       }
       return obj;
     },
@@ -63,5 +58,9 @@ const StudentSchema = new mongoose.Schema({
 export interface Student extends StudentData, mongoose.Document { }
 
 export const Student = mongoose.model<Student>('Student', StudentSchema);
+
+export function isStudent(x: unknown): x is Student {
+  return x instanceof Student;
+}
 
 export default Student;
