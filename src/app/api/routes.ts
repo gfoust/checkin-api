@@ -11,13 +11,6 @@ router.use((err: any, req: Request, res: Response, next: NextFunction) => {
   res.json({ message: err.message });
 });
 
-// router.param('familyid', families.addFamilyToLocals);
-// router.get('/families/', families.readFamilies);
-// router.get('/families/:familyid', families.readFamily);
-// router.post('/families/', families.createFamily);
-// router.patch('/families/:familyid', families.patchFamily);
-// router.delete('/families/:familyid', families.deleteFamily);
-
 router.param('classid', classes.addClassToLocals);
 router.get('/classes/', classes.readClasses);
 router.get('/classes/:classid', classes.readClass);

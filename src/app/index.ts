@@ -1,11 +1,21 @@
 import express, { NextFunction, Request, Response } from 'express';
+import expressWs from 'express-ws';
 import morgan from 'morgan';
 
 import apiRoutes from './api/routes';
+import * as checkin from './api/ws/checkin';
 
-const app = express();
+const wsInstance = expressWs(express());
+const app = wsInstance.app;
 
 app.use(morgan('dev'));
+
+app.use((req, res, next) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  next();
+});
+
+checkin.registerWs(wsInstance);
 
 app.use('/api', apiRoutes);
 
