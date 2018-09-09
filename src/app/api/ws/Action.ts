@@ -9,6 +9,6 @@ export interface SetStudentStatus {
   status: string;
 }
 
-export type Action = RequestLoadStudents;
+export type Action = RequestLoadStudents | SetStudentStatus;
 
 export default Action;

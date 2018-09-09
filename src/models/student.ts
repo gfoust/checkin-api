@@ -6,6 +6,7 @@ export interface StudentData {
   firstName: string;
   lastName: string;
   class: null | string | mongoose.Types.ObjectId | Class;
+  status: string;
 }
 
 const StudentSchema = new mongoose.Schema({
