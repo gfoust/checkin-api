@@ -15,7 +15,7 @@ export interface Config {
 const config: Config = {
   serverPort: 8000,
   db: {
-    host: 'checkin-mongo',
+    host: 'checkin-db',
     port: 27017,
     name: 'checkin',
   },
