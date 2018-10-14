@@ -37,8 +37,8 @@ const StudentSchema = new mongoose.Schema({
   status: {
     type: String,
     required: true,
-    enum: [ 'away', 'present', 'awaited' ],
-    default: 'away',
+    enum: [ 'absent', 'present', 'ready' ],
+    default: 'absent',
   },
 }, {
   toJSON: {

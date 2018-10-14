@@ -3,6 +3,7 @@ import { Student } from '../../models/student';
 import { Dictionary } from '../../util';
 import { lookupClass } from './classes';
 import validationError from './validationError';
+import { reportDeletedStudent, reportNewStudent, reportUpdatedStudent } from './ws/checkin';
 
 export async function readStudents(req: Request, res: Response) {
   const query: Dictionary<string | null> =  { };
@@ -52,6 +53,7 @@ export async function createStudent(req: Request, res: Response, next: NextFunct
 
     await student.save();
     res.json(student);
+    reportNewStudent(student);
   }
   catch (err) {
     const verr = validationError(err);
@@ -119,6 +121,7 @@ export async function patchStudent(req: Request, res: Response, next: NextFuncti
   try {
     await student.save();
     res.json(student);
+    reportUpdatedStudent(student);
   }
   catch (err) {
     const verr = validationError(err);
@@ -136,4 +139,5 @@ export async function deleteStudent(req: Request, res: Response) {
   const student = res.locals.student as Student;
   await student.remove();
   res.json(student);
+  reportDeletedStudent(student);
 }
